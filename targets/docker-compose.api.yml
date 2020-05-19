@@ -1,0 +1,12 @@
+version: "2"
+services:
+  api-server:
+    container_name: oddin-api-server
+    labels:
+      - traefik.backend=api-server
+      - traefik.frontend.rule=Host:api.oddin.localhost
+      - traefik.docker.network=oddin-network
+      - traefik.port=3000
+
+  api-database:
+    container_name: oddin-api-database

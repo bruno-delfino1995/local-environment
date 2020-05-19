@@ -1,8 +1,0 @@
-version: "2"
-services:
-  www:
-    container_name: oddin-www
-    environment:
-      WS_URL: http://oddin.localhost:8080
-    ports:
-      - '80:3000'

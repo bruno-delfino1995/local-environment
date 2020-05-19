@@ -54,7 +54,19 @@ case "$COMMAND" in
     exit 1;
 esac
 
+header() {
+  echo -e "\n\e[1mRunning \e[33m$COMMAND\e[39m for target \e[32m$1\e[0m\n"
+}
+
 run() {
+  header "local-environment"
+
+  docker-compose \
+    -f "$DIR/../docker-compose.yml" \
+    -f "$DIR/../docker-compose.network.yml" \
+    -p oddin-local-environment \
+    ${COMPOSE_COMMAND}
+
   while IFS='' read -r target; do
     run_for_one "$target"
   done < "$DIR/../targets.cfg"
@@ -62,16 +74,16 @@ run() {
 
 run_for_one() {
   local target=$1
-
-  echo -e "\n\e[1mRunning \e[33m$COMMAND\e[39m for target \e[32m$target\e[0m\n"
+  header $target
 
   # NOTE: Given that we encourage a per repository configuration, and
   # docker-compose uses the context of the first file, there's no way to use all
   # the compose files at once
   docker-compose \
     -f "$DIR/../../$target/docker-compose.yml" \
-    -f "$DIR/../docker-compose.yml" \
-    -f "$DIR/../docker-compose.$target.yml" \
+    -f "$DIR/../targets/docker-compose.$target.yml" \
+    -f "$DIR/../docker-compose.network.yml" \
+    -p "oddin-$target" \
     ${COMPOSE_COMMAND}
 }
 
