@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "parameters",
+  "description": "Format expected by templates when importing `values.json`",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ca"],
+  "properties": {
+    "ca": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["crt", "key"],
+      "properties": {
+        "crt": { "type": "string" },
+        "key": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -o errexit
+
+DIR=$(readlink -f "$(dirname "$0")")
+cd "$DIR/.." || exit 1
+
+# TODO: Try using subcharts on the configuration chart. It's not this way
+# already because `bitnami/contour` has some problems and we haven't had the
+# time to contribute; from `jetstack/cert-manager` side, their chart seem quite
+# stable
+echo "Installing Contour ..."
+kubectl apply --validate=false -f https://projectcontour.io/quickstart/contour.yaml > /dev/null
+echo "Installing Cert-Manager ..."
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml > /dev/null
+
+echo "Waiting for Cert-Manager ..."
+kubectl wait --namespace cert-manager \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/name=cert-manager \
+  --timeout=90s > /dev/null
+
+echo "Installing certificate ..."
+jq -n \
+  --rawfile crt data/certs/tls.crt \
+  --rawfile key data/certs/tls.key \
+  '{ca: {crt: $crt, key: $key}}' > kcp/values.json
+kubecfg update $(fd -e yaml -e jsonnet -g '*' 'kcp')

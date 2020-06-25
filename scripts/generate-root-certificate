@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -o errexit
+
+DIR=$(readlink -f "$(dirname "$0")")
+
+usage() {
+  cat <<EOF
+Generates a root certificate to be used within the cluster
+
+Options:
+  -h, --help Shows this message
+EOF
+}
+
+cd "$DIR/.." || exit 1
+mkdir -p data/certs
+
+echo "Creating local root certificate..."
+# NOTE: This certificate is used only for local development, we don't need to
+# worry neither about creating certificate chains with intermediate certicates
+# nor regarding the key length.
+openssl req -x509 -sha256 -days 3650 -newkey rsa:2048 \
+    -config scripts/certificate.conf -keyout data/certs/tls.key \
+    -out data/certs/tls.crt &> /dev/null
+
+echo "Certificate successfully generated at: data/certs/tls.crt"
+echo "Remeber to trust it"
