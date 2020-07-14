@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: registry
+  labels:
+    app.kubernetes.io/name: registry
+spec:
+  replicas: 1
+  serviceName: registry-headless
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: registry
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: registry
+    spec:
+      containers:
+      - name: registry
+        image: registry:2
+        env:
+          - name: REGISTRY_HTTP_ADDR
+            value: "0.0.0.0:80"
+        volumeMounts:
+        - name: storage
+          mountPath: /var/lib/registry
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 8Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-headless
+  labels:
+    app.kubernetes.io/name: registry
+spec:
+  selector:
+    app.kubernetes.io/name: registry
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: registry
+  labels:
+    app.kubernetes.io/name: registry
+spec:
+  selector:
+    app.kubernetes.io/name: registry
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30008
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: ca-issuer
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+  name: registry
+spec:
+  rules:
+    - host: registry.oddin.org
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: registry
+              servicePort: 80
+  tls: 
+    - secretName: registry-tls
+      hosts:
+        - registry.oddin.org
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: registry
+spec:
+  virtualhost:
+    fqdn: registry.oddin.org
+    tls:
+      secretName: registry-tls
+  routes:
+    - conditions:
+        - prefix: /
+      services:
+        - name: registry
+          port: 80

@@ -15,10 +15,11 @@ echo "Installing Cert-Manager ..."
 kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml > /dev/null
 
 echo "Waiting for Cert-Manager ..."
+sleep 10 # k8s doesn't detect the resource sometimes
 kubectl wait --namespace cert-manager \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/name=cert-manager \
-  --timeout=90s > /dev/null
+  --timeout=120s > /dev/null
 
 echo "Installing certificate ..."
 jq -n \
