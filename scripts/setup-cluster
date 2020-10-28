@@ -25,5 +25,5 @@ echo "Installing certificate ..."
 jq -n \
   --rawfile crt data/certs/tls.crt \
   --rawfile key data/certs/tls.key \
-  '{ca: {crt: $crt, key: $key}}' > kcp/values.json
-kubecfg update $(fd -e yaml -e jsonnet -g '*' 'kcp')
+  '{ca: {crt: $crt, key: $key}}' \
+  | kct compile kcp -f - | kubectl apply -f -

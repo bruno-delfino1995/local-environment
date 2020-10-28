@@ -1,0 +1,8 @@
+{
+	"registry": "registry.oddin.org",
+	"domain": "oddin.localhost",
+	"ca": {
+		"crt": "certificate",
+		"key": "private key"
+	}
+}
