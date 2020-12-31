@@ -122,7 +122,7 @@ local secretName = "registry-tls";
 		},
 	},
 	ingress: {
-		apiVersion: "extensions/v1beta1",
+		apiVersion: "networking.k8s.io/v1",
 		kind: "Ingress",
 		metadata: {
 			name: "registry",
@@ -139,9 +139,14 @@ local secretName = "registry-tls";
 						paths: [
 							{
 								path: "/",
+								pathType: "Prefix",
 								backend: {
-									serviceName: $.service.metadata.name,
-									servicePort: 80,
+									service: {
+										name: $.service.metadata.name,
+										port: {
+											number: 80,
+										}
+									},
 								},
 							},
 						],

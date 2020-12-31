@@ -64,7 +64,7 @@ local certManagerNamespace = "cert-manager";
 			},
 		},
 		ingress: {
-			apiVersion: "extensions/v1beta1",
+			apiVersion: "networking.k8s.io/v1",
 			kind: "Ingress",
 			metadata: {
 				name: "tls-placeholder",
@@ -81,9 +81,14 @@ local certManagerNamespace = "cert-manager";
 							paths: [
 								{
 									path: "/",
+									pathType: "Prefix",
 									backend: {
-										serviceName: $.placeholder.service.metadata.name,
-										servicePort: 80,
+										service: {
+											name: $.placeholder.service.metadata.name,
+											port: {
+												number: 80,
+											},
+										},
 									},
 								},
 							],
@@ -95,9 +100,14 @@ local certManagerNamespace = "cert-manager";
 							paths: [
 								{
 									path: "/",
+									pathType: "Prefix",
 									backend: {
-										serviceName: $.placeholder.service.metadata.name,
-										servicePort: 80,
+										service: {
+											name: $.placeholder.service.metadata.name,
+											port: {
+												number: 80,
+											},
+										},
 									},
 								},
 							],
