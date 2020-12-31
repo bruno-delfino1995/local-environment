@@ -43,6 +43,14 @@ docker container stop $(kind get nodes --name oddin)
 kind delete cluster --name oddin
 ```
 
+## Commands
+
+To make your life a little easier, we've created a `Makefile` with minimal commands.
+
+- `install` to create and setup a cluster and context
+- `uninstall` to remove the cluster and context
+- `stop` to pause your cluster for a moment
+
 ## Contributing
 
 Feel free to implement any script that might speed up the daily life of our fellow contributors, only remember to have a `--help` on it.

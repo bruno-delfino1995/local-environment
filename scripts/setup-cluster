@@ -2,24 +2,30 @@
 
 set -o errexit
 
+eval "$(docopts -h - : "$@" <<EOF
+Installs components in the cluster for TLS
+
+Usage: setup-cluster [options]
+
+Options:
+  -h, --help  Show help options.
+EOF
+)"
+
 DIR=$(readlink -f "$(dirname "$0")")
 cd "$DIR/.." || exit 1
 
-# TODO: Try using subcharts on the configuration chart. It's not this way
-# already because `bitnami/contour` has some problems and we haven't had the
-# time to contribute; from `jetstack/cert-manager` side, their chart seem quite
-# stable
 echo "Installing Contour ..."
-kubectl apply --validate=false -f https://projectcontour.io/quickstart/contour.yaml > /dev/null
+kubectl apply --validate=false -f https://projectcontour.io/quickstart/contour.yaml
 echo "Installing Cert-Manager ..."
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml > /dev/null
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.yaml
 
 echo "Waiting for Cert-Manager ..."
 sleep 10 # k8s doesn't detect the resource sometimes
 kubectl wait --namespace cert-manager \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/name=cert-manager \
-  --timeout=120s > /dev/null
+  --timeout=5m > /dev/null
 
 echo "Installing certificate ..."
 jq -n \

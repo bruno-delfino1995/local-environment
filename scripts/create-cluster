@@ -1,25 +1,21 @@
 #!/usr/bin/env bash
-# Copyright 2020 The Kubernetes Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
- 
-# Adapted from:
-# https://github.com/tilt-dev/kind-local/blob/b2c32c50661438aebed5f4e5c4a66013d9020cdd/kind-with-registry.sh
- 
+
 set -o errexit
 
+eval "$(docopts -h - : "$@" <<EOF
+Creates a local Kind cluster
+
+Usage: create-cluster [options]
+
+Options:
+  -h, --help            Show help options.
+  -n, --name <NAME>     Name for Kind cluster [default: oddin].
+  -c, --context <NAME>  Name for new context [default: asgard].
+EOF
+)"
+
 # create a cluster with the local registry enabled in containerd
-cat <<EOF | kind create cluster --name "oddin" --config=-
+cat <<EOF | kind create cluster --name "$name" --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 containerdConfigPatches:
@@ -38,3 +34,5 @@ nodes:
         protocol: TCP
         listenAddress: "0.0.0.0"
 EOF
+
+kubectx "$context=kind-$name"
