@@ -1,6 +1,16 @@
 local secretName = "registry-tls";
 
 {
+	config: {
+		apiVersion: "v1",
+		kind: "ConfigMap",
+		metadata: {
+			name: "registry-config"
+		},
+		data: {
+			"config.yml": _.files('registry.yaml'),
+		},
+	},
 	statefulset: {
 		apiVersion: "apps/v1",
 		kind: "StatefulSet",
@@ -25,18 +35,24 @@ local secretName = "registry-tls";
 						{
 							name: "registry",
 							image: "registry:2",
-							env: [
-								{
-									name: "REGISTRY_HTTP_ADDR",
-									value: "0.0.0.0:80",
-								},
-							],
 							volumeMounts: [
 								{
 									name: "storage",
 									mountPath: "/var/lib/registry",
 								},
+								{
+									name: "config",
+									mountPath: "/etc/docker/registry",
+								},
 							],
+						},
+					],
+					volumes: [
+						{
+							name: "config",
+							configMap: {
+								name: $.config.metadata.name,
+							},
 						},
 					],
 				},
