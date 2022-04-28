@@ -1,0 +1,8 @@
+{
+	"registry": "registry.domain.tld",
+	"domain": "domain.localhost",
+	"ca": {
+		"crt": "certificate",
+		"key": "private key"
+	}
+}

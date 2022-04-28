@@ -27,9 +27,9 @@ kubectl wait --namespace cert-manager \
   --selector=app.kubernetes.io/name=cert-manager \
   --timeout=5m > /dev/null
 
-echo "Installing certificate ..."
+echo "Installing certificate and registry ..."
+template='{registry: "registry.oddin.org", domain: "oddin.localhost", ca: {crt: $crt, key: $key}}'
 jq -n \
   --rawfile crt data/certs/tls.crt \
   --rawfile key data/certs/tls.key \
-  '{ca: {crt: $crt, key: $key}}' \
-  | kct compile kcp -f - | kubectl apply -f -
+  "$template" | kct compile kcp -i - | kubectl apply -f -

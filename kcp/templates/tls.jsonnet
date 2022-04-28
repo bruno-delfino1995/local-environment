@@ -1,3 +1,4 @@
+local _ = import "kct.io";
 local certManagerNamespace = "cert-manager";
 
 {
@@ -11,12 +12,12 @@ local certManagerNamespace = "cert-manager";
 			},
 			type: "Opaque",
 			data: {
-				"tls.crt": std.base64(_.values.ca.crt),
-				"tls.key": std.base64(_.values.ca.key),
+				"tls.crt": std.base64(_.input.ca.crt),
+				"tls.key": std.base64(_.input.ca.key),
 			},
 		},
 		issuer: {
-			apiVersion: "cert-manager.io/v1alpha2",
+			apiVersion: "cert-manager.io/v1",
 			kind: "ClusterIssuer",
 			metadata: {
 				name: "ca-issuer",
@@ -76,7 +77,7 @@ local certManagerNamespace = "cert-manager";
 			spec: {
 				rules: [
 					{
-						host: _.values.domain,
+						host: _.input.domain,
 						http: {
 							paths: [
 								{
@@ -95,7 +96,7 @@ local certManagerNamespace = "cert-manager";
 						},
 					},
 					{
-						host: "*.%s" % _.values.domain,
+						host: "*.%s" % _.input.domain,
 						http: {
 							paths: [
 								{
@@ -118,8 +119,8 @@ local certManagerNamespace = "cert-manager";
 					{
 						secretName: "domain-tls",
 						hosts: [
-							_.values.domain,
-							"*.%s" % _.values.domain,
+							_.input.domain,
+							"*.%s" % _.input.domain,
 						],
 					},
 				],

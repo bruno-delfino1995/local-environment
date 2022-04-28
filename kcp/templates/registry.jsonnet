@@ -1,3 +1,4 @@
+local _ = import "kct.io";
 local secretName = "registry-tls";
 
 {
@@ -134,7 +135,7 @@ local secretName = "registry-tls";
 		spec: {
 			rules: [
 				{
-					host: _.values.registry,
+					host: _.input.registry,
 					http: {
 						paths: [
 							{
@@ -157,7 +158,7 @@ local secretName = "registry-tls";
 				{
 					secretName: secretName,
 					hosts: [
-						_.values.registry,
+						_.input.registry,
 					],
 				},
 			],
@@ -171,7 +172,7 @@ local secretName = "registry-tls";
 		},
 		spec: {
 			virtualhost: {
-				fqdn: _.values.registry,
+				fqdn: _.input.registry,
 				tls: {
 					secretName: secretName,
 				},
