@@ -1,16 +1,24 @@
+name = oddin
+context = oddin-local
+
 .PHONY: install
 install:
-	@bash ./scripts/create-cluster
+	@bash ./scripts/create-cluster -n ${name} -c ${context}
 	@bash ./scripts/generate-root-certificate
-	@bash ./scripts/setup-cluster
+	@bash ./scripts/setup-cluster -n ${name} -t "org"
 
 .PHONY: uninstall
 uninstall:
-	@kind delete cluster --name oddin
+	@k3d cluster delete ${name}
 	@kubectx -u
-	@kubectx -d asgard
+	@kubectx -d ${context}
+
+.PHONY: start
+start:
+	@k3d cluster start ${name}
+	@kubectx ${context}
 
 .PHONY: stop
 stop:
-	@docker container stop `kind get nodes --name oddin`
+	@k3d cluster stop ${name}
 	@kubectx -u

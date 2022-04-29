@@ -1,6 +1,6 @@
 {
-	"registry": "registry.domain.tld",
-	"domain": "domain.localhost",
+	"name": "oddin",
+	"tld": "org",
 	"ca": {
 		"crt": "certificate",
 		"key": "private key"

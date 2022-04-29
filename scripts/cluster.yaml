@@ -1,0 +1,17 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+servers: 1
+agents: 2
+registries:
+  config: |
+    mirrors:
+      "registry.oddin.org":
+        endpoint:
+          - http://localhost:30008
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer

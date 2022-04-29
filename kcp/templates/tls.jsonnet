@@ -1,129 +1,41 @@
 local _ = import "kct.io";
-local certManagerNamespace = "cert-manager";
 
 {
-	cert: {
-		secret: {
-			apiVersion: "v1",
-			kind: "Secret",
-			metadata: {
-				name: "ca-key-pair",
-				namespace: certManagerNamespace,
-			},
-			type: "Opaque",
-			data: {
-				"tls.crt": std.base64(_.input.ca.crt),
-				"tls.key": std.base64(_.input.ca.key),
-			},
+	secret: {
+		apiVersion: "v1",
+		kind: "Secret",
+		metadata: {
+			name: "ca-key-pair",
+			namespace: "cert-manager",
 		},
-		issuer: {
-			apiVersion: "cert-manager.io/v1",
-			kind: "ClusterIssuer",
-			metadata: {
-				name: "ca-issuer",
-				namespace: certManagerNamespace,
-			},
-			spec: {
-				ca: { secretName: $.cert.secret.metadata.name, },
-			},
+		type: "Opaque",
+		data: {
+			"tls.crt": std.base64(_.input.ca.crt),
+			"tls.key": std.base64(_.input.ca.key),
 		},
 	},
-	placeholder: {
-		pod: {
-			kind: "Pod",
-			apiVersion: "v1",
-			metadata: {
-				name: "http-echo",
-				labels: {
-					"app.kubernetes.io/name": "http-echo",
-				},
-			},
-			spec: {
-				containers: [
-					{
-						name: "http-echo",
-						image: "hashicorp/http-echo",
-						args: [ "-text='You\'re not supposed to be here'" ],
-					},
-				],
-			},
+	issuer: {
+		apiVersion: "cert-manager.io/v1",
+		kind: "ClusterIssuer",
+		metadata: {
+			name: "default-issuer",
+			namespace: "cert-manager",
 		},
-		service: {
-			kind: "Service",
-			apiVersion: "v1",
-			metadata: {
-				name: "tls-placeholder",
-			},
-			spec: {
-				selector: $.placeholder.pod.metadata.labels,
-				ports: [
-					{
-						port: 80,
-						targetPort: 5678,
-					},
-				],
-			},
+		spec: {
+			ca: { secretName: $.secret.metadata.name, },
 		},
-		ingress: {
-			apiVersion: "networking.k8s.io/v1",
-			kind: "Ingress",
-			metadata: {
-				name: "tls-placeholder",
-				annotations: {
-					"cert-manager.io/cluster-issuer": $.cert.issuer.metadata.name,
-					"ingress.kubernetes.io/force-ssl-redirect": "true",
-				},
-			},
-			spec: {
-				rules: [
-					{
-						host: _.input.domain,
-						http: {
-							paths: [
-								{
-									path: "/",
-									pathType: "Prefix",
-									backend: {
-										service: {
-											name: $.placeholder.service.metadata.name,
-											port: {
-												number: 80,
-											},
-										},
-									},
-								},
-							],
-						},
-					},
-					{
-						host: "*.%s" % _.input.domain,
-						http: {
-							paths: [
-								{
-									path: "/",
-									pathType: "Prefix",
-									backend: {
-										service: {
-											name: $.placeholder.service.metadata.name,
-											port: {
-												number: 80,
-											},
-										},
-									},
-								},
-							],
-						},
-					},
-				],
-				tls: [
-					{
-						secretName: "domain-tls",
-						hosts: [
-							_.input.domain,
-							"*.%s" % _.input.domain,
-						],
-					},
-				],
+	},
+	middleware: {
+		apiVersion: "traefik.containo.us/v1alpha1",
+		kind: "Middleware",
+		metadata: {
+			name: "force-https",
+			namespace: "kube-system"
+		},
+		spec: {
+			redirectScheme: {
+				scheme: "https",
+				permanent: true,
 			},
 		},
 	},

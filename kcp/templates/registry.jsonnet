@@ -1,5 +1,5 @@
 local _ = import "kct.io";
-local secretName = "registry-tls";
+local host = "registry.%s.%s" % [_.input.name, _.input.tld];
 
 {
 	config: {
@@ -129,13 +129,13 @@ local secretName = "registry-tls";
 			name: "registry",
 			annotations: {
 				"cert-manager.io/cluster-issuer": "ca-issuer",
-				"ingress.kubernetes.io/force-ssl-redirect": "true",
+				"traefik.ingress.kubernetes.io/router.middlewares": "kube-system-force-https@kubernetescrd",
 			},
 		},
 		spec: {
 			rules: [
 				{
-					host: _.input.registry,
+					host: host,
 					http: {
 						paths: [
 							{
@@ -156,40 +156,8 @@ local secretName = "registry-tls";
 			],
 			tls: [
 				{
-					secretName: secretName,
-					hosts: [
-						_.input.registry,
-					],
-				},
-			],
-		},
-	},
-	proxy: {
-		apiVersion: "projectcontour.io/v1",
-		kind: "HTTPProxy",
-		metadata: {
-			name: "registry",
-		},
-		spec: {
-			virtualhost: {
-				fqdn: _.input.registry,
-				tls: {
-					secretName: secretName,
-				},
-			},
-			routes: [
-				{
-					conditions: [
-						{
-							prefix: "/",
-						},
-					],
-					services: [
-						{
-							name: $.service.metadata.name,
-							port: 80,
-						},
-					],
+					secretName: "registry-cert",
+					hosts: [host],
 				},
 			],
 		},

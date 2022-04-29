@@ -1,10 +1,12 @@
+local name = "shell";
 {
 	apiVersion: "apps/v1",
 	kind: "Deployment",
 	metadata: {
-		name: "debug",
+		name: name,
+		namespace: "debug",
 		labels: {
-			"app.kubernetes.io/name": "debug"
+			"app.kubernetes.io/name": name,
 		},
 	},
 	spec: {
@@ -19,7 +21,7 @@
 			spec: {
 				containers: [
 					{
-						name: "debug",
+						name: name,
 						image: "ubuntu:20.04",
 						imagePullPolicy: "IfNotPresent",
 						command: [ "sh" ],

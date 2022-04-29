@@ -8,31 +8,19 @@ Creates a local Kind cluster
 Usage: create-cluster [options]
 
 Options:
-  -h, --help            Show help options.
-  -n, --name <NAME>     Name for Kind cluster [default: oddin].
-  -c, --context <NAME>  Name for new context [default: asgard].
+  -h, --help             Show help options.
+  -n, --name <VALUE>     Name for Kind cluster [default: oddin].
+  -c, --context <VALUE>  Name for new context [default: oddin-local].
 EOF
 )"
 
-# create a cluster with the local registry enabled in containerd
-cat <<EOF | kind create cluster --name "$name" --config=-
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-containerdConfigPatches:
-  - |-
-    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.oddin.org"]
-      endpoint = ["http://localhost:30008"]
-nodes:
-  - role: control-plane
-    extraPortMappings:
-      - containerPort: 80
-        hostPort: 80
-        protocol: TCP
-        listenAddress: "0.0.0.0"
-      - containerPort: 443
-        hostPort: 443
-        protocol: TCP
-        listenAddress: "0.0.0.0"
-EOF
+DIR=$(readlink -f "$(dirname "$0")")
+cd "$DIR" || exit 1
 
-kubectx "$context=kind-$name"
+if k3d cluster list "$name" | grep -q "$name"; then
+	exit 0
+fi
+
+k3d cluster create "$name" --config cluster.yaml
+
+kubectx "$context=k3d-$name"

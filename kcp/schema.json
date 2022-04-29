@@ -1,10 +1,10 @@
 {
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["ca"],
+	"required": ["name", "tld", "ca"],
 	"properties": {
-		"registry": { "type": "string" },
-		"domain": { "type": "string" },
+		"name": { "type": "string" },
+		"tld": { "type": "string" },
 		"ca": {
 			"type": "object",
 			"additionalProperties": false,

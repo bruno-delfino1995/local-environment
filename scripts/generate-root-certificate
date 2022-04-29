@@ -17,13 +17,20 @@ cd "$DIR/.." || exit 1
 
 mkdir -p data/certs
 
+KEY_PATH="data/certs/tls.key"
+CRT_PATH="data/certs/tls.crt"
+
+if [[ -e "$CRT_PATH" && -e "$KEY_PATH" ]]; then
+	exit 0
+fi
+
 echo "Creating local root certificate..."
 # NOTE: This certificate is used only for local development, we don't need to
 # worry neither about creating certificate chains with intermediate certicates
 # nor regarding the key length.
 openssl req -x509 -sha256 -days 3650 -newkey rsa:2048 \
-    -config scripts/certificate.conf -keyout data/certs/tls.key \
-    -out data/certs/tls.crt &> /dev/null
+    -config scripts/certificate.conf -keyout "$KEY_PATH" \
+    -out "$CRT_PATH" &> /dev/null
 
-echo "Certificate successfully generated at: data/certs/tls.crt"
+echo "Certificate successfully generated at: $CRT_PATH"
 echo "Remeber to trust it"
