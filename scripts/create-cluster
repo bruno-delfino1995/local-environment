@@ -15,12 +15,12 @@ EOF
 )"
 
 DIR=$(readlink -f "$(dirname "$0")")
-cd "$DIR" || exit 1
+cd "$DIR/.." || exit 1
 
-if k3d cluster list "$name" | grep -q "$name"; then
+if k3d cluster list "$name" 2> /dev/null | grep -q "$name"; then
 	exit 0
 fi
 
-k3d cluster create "$name" --config cluster.yaml
+k3d cluster create "$name" --config config/cluster.yaml
 
 kubectx "$context=k3d-$name"

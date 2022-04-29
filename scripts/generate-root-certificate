@@ -29,7 +29,7 @@ echo "Creating local root certificate..."
 # worry neither about creating certificate chains with intermediate certicates
 # nor regarding the key length.
 openssl req -x509 -sha256 -days 3650 -newkey rsa:2048 \
-    -config scripts/certificate.conf -keyout "$KEY_PATH" \
+    -config config/certificate.conf -keyout "$KEY_PATH" \
     -out "$CRT_PATH" &> /dev/null
 
 echo "Certificate successfully generated at: $CRT_PATH"

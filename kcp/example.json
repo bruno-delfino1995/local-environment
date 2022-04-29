@@ -1,7 +1,10 @@
 {
-	"name": "oddin",
-	"tld": "org",
-	"ca": {
+	"host": "oddin.localhost",
+	"registry": {
+		"host": "registry.oddin.org",
+		"proxy": false
+	},
+	"cert": {
 		"crt": "certificate",
 		"key": "private key"
 	}

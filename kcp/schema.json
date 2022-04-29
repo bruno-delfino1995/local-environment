@@ -1,11 +1,19 @@
 {
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["name", "tld", "ca"],
+	"required": ["host", "registry", "cert"],
 	"properties": {
-		"name": { "type": "string" },
-		"tld": { "type": "string" },
-		"ca": {
+		"host": { "type": "string", "format": "hostname" },
+		"registry": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["host"],
+			"properties": {
+				"host": { "type": "string" },
+				"proxy": { "type": "boolean" }
+			}
+		},
+		"cert": {
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["crt", "key"],

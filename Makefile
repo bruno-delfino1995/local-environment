@@ -5,7 +5,7 @@ context = oddin-local
 install:
 	@bash ./scripts/create-cluster -n ${name} -c ${context}
 	@bash ./scripts/generate-root-certificate
-	@bash ./scripts/setup-cluster -n ${name} -t "org"
+	@bash ./scripts/setup-cluster -d "${name}.localhost" -r "registry.${name}.org" -p false
 
 .PHONY: uninstall
 uninstall:
@@ -22,3 +22,7 @@ start:
 stop:
 	@k3d cluster stop ${name}
 	@kubectx -u
+
+.PHONY: status
+status:
+	@k3d cluster list ${name}

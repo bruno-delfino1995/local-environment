@@ -1,7 +1,6 @@
 local _ = import "kct.io";
-local tls = import "tls.jsonnet";
 local name = "kuard";
-local host = "%s.%s.localhost" % [name, _.input.name];
+local host = "%s.%s" % [name, _.input.host];
 
 {
 	deployment: {
@@ -63,7 +62,7 @@ local host = "%s.%s.localhost" % [name, _.input.name];
 			name: name,
 			namespace: "debug",
 			annotations: {
-				"cert-manager.io/cluster-issuer": tls.issuer.metadata.name,
+				"cert-manager.io/cluster-issuer": "default-issuer",
 				"traefik.ingress.kubernetes.io/router.middlewares": "kube-system-force-https@kubernetescrd",
 			}
 		},
@@ -89,7 +88,7 @@ local host = "%s.%s.localhost" % [name, _.input.name];
 			}],
 			tls: [{
 				hosts: [host],
-				secretName: "%s-cert" % [name, _.input.name],
+				secretName: "%s-cert" % name,
 			}],
 		},
 	},

@@ -1,12 +1,20 @@
 local _ = import "kct.io";
-local host = "registry.%s.%s" % [_.input.name, _.input.tld];
 
 {
+	namespace: {
+		apiVersion: "v1",
+		kind: "Namespace",
+		metadata: {
+			name: "registry",
+		}
+	}
+	,
 	config: {
 		apiVersion: "v1",
 		kind: "ConfigMap",
 		metadata: {
-			name: "registry-config"
+			name: "registry-config",
+			namespace: "registry"
 		},
 		data: {
 			"config.yml": _.files('registry.yaml'),
@@ -17,6 +25,7 @@ local host = "registry.%s.%s" % [_.input.name, _.input.tld];
 		kind: "StatefulSet",
 		metadata: {
 			name: "registry",
+			namespace: "registry",
 			labels: {
 				"app.kubernetes.io/name": "registry",
 			},
@@ -82,6 +91,7 @@ local host = "registry.%s.%s" % [_.input.name, _.input.tld];
 		kind: "Service",
 		metadata: {
 			name: "registry-headless",
+			namespace: "registry",
 			labels: {
 				"app.kubernetes.io/name": "registry",
 			},
@@ -104,6 +114,7 @@ local host = "registry.%s.%s" % [_.input.name, _.input.tld];
 		apiVersion: "v1",
 		metadata: {
 			name: "registry",
+			namespace: "registry",
 			labels: {
 				"app.kubernetes.io/name": "registry",
 			},
@@ -127,6 +138,7 @@ local host = "registry.%s.%s" % [_.input.name, _.input.tld];
 		kind: "Ingress",
 		metadata: {
 			name: "registry",
+			namespace: "registry",
 			annotations: {
 				"cert-manager.io/cluster-issuer": "ca-issuer",
 				"traefik.ingress.kubernetes.io/router.middlewares": "kube-system-force-https@kubernetescrd",
@@ -135,7 +147,7 @@ local host = "registry.%s.%s" % [_.input.name, _.input.tld];
 		spec: {
 			rules: [
 				{
-					host: host,
+					host: _.input.registry.host,
 					http: {
 						paths: [
 							{
@@ -157,7 +169,7 @@ local host = "registry.%s.%s" % [_.input.name, _.input.tld];
 			tls: [
 				{
 					secretName: "registry-cert",
-					hosts: [host],
+					hosts: [_.input.registry.host],
 				},
 			],
 		},

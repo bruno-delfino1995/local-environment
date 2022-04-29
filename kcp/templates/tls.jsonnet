@@ -10,8 +10,8 @@ local _ = import "kct.io";
 		},
 		type: "Opaque",
 		data: {
-			"tls.crt": std.base64(_.input.ca.crt),
-			"tls.key": std.base64(_.input.ca.key),
+			"tls.crt": std.base64(_.input.cert.crt),
+			"tls.key": std.base64(_.input.cert.key),
 		},
 	},
 	issuer: {

@@ -8,9 +8,10 @@ Installs components in the cluster
 Usage: setup-cluster [options]
 
 Options:
-  -h, --help          Show help options.
-  -n, --name <VALUE>  The part before the tld in the domain [default: oddin].
-  -t, --tld <VALUE>   TLD for your public domain [default: org].
+  -h, --help              Show help options.
+  -d, --domain <VALUE>    Domain for your application [default: oddin.localhost].
+  -r, --registry <VALUE>  Registry hostname with your images [default: registry.oddin.org].
+  -p, --proxy <VALUE>     Whether or not to configure local registry as proxy [default: false].
 EOF
 )"
 
@@ -28,10 +29,20 @@ kubectl wait --namespace cert-manager \
   --timeout=5m > /dev/null
 
 echo "Installing configuration package ..."
-template="{name: \"$name\", tld: \"$tld\", ca: {crt: \$crt, key: \$key}}"
+template=$(cat <<HEREDOC
+{
+	host: "$domain",
+	registry: {host: "$registry", proxy: $proxy},
+	cert: {crt: \$crt, key: \$key}
+}
+HEREDOC
+)
+
 jq -n \
   --rawfile crt data/certs/tls.crt \
   --rawfile key data/certs/tls.key \
   "$template" > data/values.json
 
-kct compile kcp -i data/values.json | tee data/rendered.yaml | kubectl apply -f -
+# FIXME: We need to wait for traefik also
+# > error: unable to recognize "STDIN": no matches for kind "Middleware" in version "traefik.containo.us/v1alpha1"
+kct compile kcp -i data/values.json | tee data/rendered.yaml | kubectl apply --validate=false -f -

@@ -20,3 +20,8 @@ health:
     enabled: true
     interval: 10s
     threshold: 3
+
+{% if registry.proxy %}
+proxy:
+  remoteurl: https://registry.{{name}}.{{tld}}
+{% endif %}
