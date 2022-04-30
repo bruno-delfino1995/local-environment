@@ -1,44 +1,44 @@
+local helpers = import "helpers.libsonnet";
 local _ = import "kct.io";
+local labels = {"app.kubernetes.io/name": "registry"};
+local configName = "config";
 
-{
-	namespace: {
+helpers.inOrder([
+	{name: "namespace", value: {
 		apiVersion: "v1",
 		kind: "Namespace",
 		metadata: {
 			name: "registry",
 		}
-	}
-	,
-	config: {
+	}},
+	{name: "config", value: {
 		apiVersion: "v1",
 		kind: "ConfigMap",
 		metadata: {
-			name: "registry-config",
+			name: configName,
 			namespace: "registry"
 		},
 		data: {
 			"config.yml": _.files('registry.yaml'),
 		},
-	},
-	statefulset: {
+	}},
+	{name: "statefulset", value: {
 		apiVersion: "apps/v1",
 		kind: "StatefulSet",
 		metadata: {
 			name: "registry",
 			namespace: "registry",
-			labels: {
-				"app.kubernetes.io/name": "registry",
-			},
+			labels: labels,
 		},
 		spec: {
 			replicas: 1,
 			serviceName: "registry-headless",
 			selector: {
-				matchLabels: $.statefulset.metadata.labels,
+				matchLabels: labels,
 			},
 			template: {
 				metadata: {
-					labels: $.statefulset.metadata.labels,
+					labels: labels,
 				},
 				spec: {
 					containers: [
@@ -61,7 +61,7 @@ local _ = import "kct.io";
 						{
 							name: "config",
 							configMap: {
-								name: $.config.metadata.name,
+								name: configName,
 							},
 						},
 					],
@@ -85,8 +85,8 @@ local _ = import "kct.io";
 				},
 			],
 		},
-	},
-	headless: {
+	}},
+	{name: "headless", value: {
 		apiVersion: "v1",
 		kind: "Service",
 		metadata: {
@@ -97,7 +97,7 @@ local _ = import "kct.io";
 			},
 		},
 		spec: {
-			selector: $.statefulset.metadata.labels,
+			selector: labels,
 			type: "ClusterIP",
 			clusterIP: "None",
 			ports: [
@@ -108,19 +108,17 @@ local _ = import "kct.io";
 				},
 			],
 		},
-	},
-	service: {
+	}},
+	{name: "service", value: {
 		kind: "Service",
 		apiVersion: "v1",
 		metadata: {
 			name: "registry",
 			namespace: "registry",
-			labels: {
-				"app.kubernetes.io/name": "registry",
-			},
+			labels: labels,
 		},
 		spec: {
-			selector: $.statefulset.metadata.labels,
+			selector: labels,
 			type: "NodePort",
 			ports: [
 				{
@@ -132,8 +130,8 @@ local _ = import "kct.io";
 				},
 			],
 		},
-	},
-	ingress: {
+	}},
+	{name: "ingress", value: {
 		apiVersion: "networking.k8s.io/v1",
 		kind: "Ingress",
 		metadata: {
@@ -155,7 +153,7 @@ local _ = import "kct.io";
 								pathType: "Prefix",
 								backend: {
 									service: {
-										name: $.service.metadata.name,
+										name: "registry",
 										port: {
 											number: 80,
 										}
@@ -173,5 +171,5 @@ local _ = import "kct.io";
 				},
 			],
 		},
-	},
-}
+	}},
+])
