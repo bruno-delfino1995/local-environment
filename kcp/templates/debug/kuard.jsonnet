@@ -44,6 +44,8 @@ local host = "%s.%s" % [name, _.input.host];
 			},
 		},
 		spec: {
+			selector: $.deployment.metadata.labels,
+			type: "ClusterIP",
 			ports: [
 				{
 					port: 80,
@@ -51,8 +53,6 @@ local host = "%s.%s" % [name, _.input.host];
 					targetPort: 8080,
 				}
 			],
-			selector: $.deployment.metadata.labels,
-			type: "ClusterIP",
 		},
 	},
 	ingress: {
@@ -63,7 +63,6 @@ local host = "%s.%s" % [name, _.input.host];
 			namespace: "debug",
 			annotations: {
 				"cert-manager.io/cluster-issuer": "default-issuer",
-				"traefik.ingress.kubernetes.io/router.middlewares": "kube-system-force-https@kubernetescrd",
 			}
 		},
 		spec: {

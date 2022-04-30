@@ -1,6 +1,17 @@
 local _ = import "kct.io";
 
 {
+	traefik: {
+		apiVersion: "helm.cattle.io/v1",
+		kind: "HelmChartConfig",
+		metadata: {
+			name: "traefik",
+			namespace: "kube-system"
+		},
+		spec: {
+			valuesContent: _.files("traefik.yaml"),
+		},
+	},
 	secret: {
 		apiVersion: "v1",
 		kind: "Secret",
@@ -23,20 +34,6 @@ local _ = import "kct.io";
 		},
 		spec: {
 			ca: { secretName: $.secret.metadata.name, },
-		},
-	},
-	middleware: {
-		apiVersion: "traefik.containo.us/v1alpha1",
-		kind: "Middleware",
-		metadata: {
-			name: "force-https",
-			namespace: "kube-system"
-		},
-		spec: {
-			redirectScheme: {
-				scheme: "https",
-				permanent: true,
-			},
 		},
 	},
 }

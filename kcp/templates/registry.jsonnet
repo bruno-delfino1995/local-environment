@@ -139,7 +139,6 @@ helpers.inOrder([
 			namespace: "registry",
 			annotations: {
 				"cert-manager.io/cluster-issuer": "ca-issuer",
-				"traefik.ingress.kubernetes.io/router.middlewares": "kube-system-force-https@kubernetescrd",
 			},
 		},
 		spec: {
