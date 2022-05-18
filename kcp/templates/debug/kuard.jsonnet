@@ -1,4 +1,4 @@
-local _ = import "kct.io";
+local _ = import "kct.libsonnet";
 local name = "kuard";
 local host = "%s.%s" % [name, _.input.host];
 

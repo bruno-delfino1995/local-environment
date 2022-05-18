@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "dependencies": [
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/oddin-org/kct.git",
+          "subdir": "libsonnet"
+        }
+      },
+      "version": "9e54dc2df850c8cd1f2561e060b404d91865d832",
+      "sum": "NMqzNW7WrisjkZpR15FMgfiHf0bWSEBb7NpkfEsYTOI="
+    }
+  ],
+  "legacyImports": false
+}

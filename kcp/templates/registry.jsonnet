@@ -1,5 +1,5 @@
 local helpers = import "helpers.libsonnet";
-local _ = import "kct.io";
+local _ = import "kct.libsonnet";
 local labels = {"app.kubernetes.io/name": "registry"};
 local configName = "config";
 
