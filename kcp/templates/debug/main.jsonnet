@@ -1,7 +1,7 @@
-local helpers = import 'helpers.libsonnet';
+local _ = import 'kct.libsonnet';
 
-helpers.inOrder([
-	{name: 'namespace', value: import 'namespace.jsonnet'},
-	{name: 'shell', value: import 'shell.jsonnet'},
-	{name: 'kuard', value: import 'kuard.jsonnet'},
-])
+_.sdk.inOrder(['namespace'], {
+	namespace: import 'namespace.jsonnet',
+	shell: import 'shell.jsonnet',
+	kuard: import 'kuard.jsonnet',
+})

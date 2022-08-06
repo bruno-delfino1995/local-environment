@@ -1,6 +1,6 @@
 local _ = import "kct.libsonnet";
 
-{
+_.sdk.inOrder(['traefik', 'secret', 'issuer'], {
 	traefik: {
 		apiVersion: "helm.cattle.io/v1",
 		kind: "HelmChartConfig",
@@ -36,4 +36,4 @@ local _ = import "kct.libsonnet";
 			ca: { secretName: $.secret.metadata.name, },
 		},
 	},
-}
+})

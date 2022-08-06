@@ -1,44 +1,43 @@
-local helpers = import "helpers.libsonnet";
 local _ = import "kct.libsonnet";
-local labels = {"app.kubernetes.io/name": "registry"};
-local configName = "config";
 
-helpers.inOrder([
-	{name: "namespace", value: {
+{
+	namespace: {
 		apiVersion: "v1",
 		kind: "Namespace",
 		metadata: {
 			name: "registry",
 		}
-	}},
-	{name: "config", value: {
+	},
+	config: {
 		apiVersion: "v1",
 		kind: "ConfigMap",
 		metadata: {
-			name: configName,
+			name: "config",
 			namespace: "registry"
 		},
 		data: {
 			"config.yml": _.files('registry.yaml'),
 		},
-	}},
-	{name: "statefulset", value: {
+	},
+	statefulset: {
 		apiVersion: "apps/v1",
 		kind: "StatefulSet",
 		metadata: {
 			name: "registry",
 			namespace: "registry",
-			labels: labels,
+			labels: {
+				"app.kubernetes.io/name": "registry"
+			},
 		},
 		spec: {
 			replicas: 1,
 			serviceName: "registry-headless",
 			selector: {
-				matchLabels: labels,
+				matchLabels: $.statefulset.metadata.labels,
 			},
 			template: {
 				metadata: {
-					labels: labels,
+					labels: $.statefulset.metadata.labels,
 				},
 				spec: {
 					containers: [
@@ -61,7 +60,7 @@ helpers.inOrder([
 						{
 							name: "config",
 							configMap: {
-								name: configName,
+								name: $.config.metadata.name,
 							},
 						},
 					],
@@ -85,19 +84,17 @@ helpers.inOrder([
 				},
 			],
 		},
-	}},
-	{name: "headless", value: {
+	},
+	headless: {
 		apiVersion: "v1",
 		kind: "Service",
 		metadata: {
 			name: "registry-headless",
 			namespace: "registry",
-			labels: {
-				"app.kubernetes.io/name": "registry",
-			},
+			labels: $.statefulset.metadata.labels,
 		},
 		spec: {
-			selector: labels,
+			selector: $.statefulset.metadata.labels,
 			type: "ClusterIP",
 			clusterIP: "None",
 			ports: [
@@ -108,17 +105,17 @@ helpers.inOrder([
 				},
 			],
 		},
-	}},
-	{name: "service", value: {
+	},
+	service: {
 		kind: "Service",
 		apiVersion: "v1",
 		metadata: {
 			name: "registry",
 			namespace: "registry",
-			labels: labels,
+			labels: $.statefulset.metadata.labels,
 		},
 		spec: {
-			selector: labels,
+			selector: $.statefulset.metadata.labels,
 			type: "NodePort",
 			ports: [
 				{
@@ -130,8 +127,8 @@ helpers.inOrder([
 				},
 			],
 		},
-	}},
-	{name: "ingress", value: {
+	},
+	ingress: {
 		apiVersion: "networking.k8s.io/v1",
 		kind: "Ingress",
 		metadata: {
@@ -170,5 +167,5 @@ helpers.inOrder([
 				},
 			],
 		},
-	}},
-])
+	},
+}

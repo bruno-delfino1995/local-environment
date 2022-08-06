@@ -1,7 +1,7 @@
-local helpers = import 'helpers.libsonnet';
+local _ = import 'kct.libsonnet';
 
-helpers.inOrder([
-	{name: 'tls', value: import 'tls.jsonnet'},
-	{name: 'debug', value: import 'debug/main.jsonnet'},
-	{name: 'registry', value: import 'registry.jsonnet'},
-])
+_.sdk.inOrder(['tls', 'debug', 'registry'], {
+	tls: import 'tls.jsonnet',
+	debug: import 'debug/main.jsonnet',
+	registry: import 'registry.jsonnet',
+})
