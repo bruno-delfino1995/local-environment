@@ -9,8 +9,8 @@ Usage: setup-cluster [options]
 
 Options:
   -h, --help              Show help options.
-  -d, --domain <VALUE>    Domain for your application [default: oddin.localhost].
-  -r, --registry <VALUE>  Registry hostname with your images [default: registry.oddin.org].
+  -d, --domain <VALUE>    Domain for your application [default: example.localhost].
+  -r, --registry <VALUE>  Registry hostname with your images [default: registry.example.com].
   -p, --proxy <VALUE>     Whether or not to configure local registry as proxy [default: false].
 EOF
 )"

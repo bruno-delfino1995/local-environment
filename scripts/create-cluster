@@ -9,8 +9,8 @@ Usage: create-cluster [options]
 
 Options:
   -h, --help             Show help options.
-  -n, --name <VALUE>     Name for Kind cluster [default: oddin].
-  -c, --context <VALUE>  Name for new context [default: oddin-local].
+  -n, --name <VALUE>     Name for k8s cluster [default: example].
+  -c, --context <VALUE>  Name for new context. Defaults to <name>-local.
 EOF
 )"
 
@@ -22,5 +22,9 @@ if k3d cluster list "$name" 2> /dev/null | grep -q "$name"; then
 fi
 
 k3d cluster create "$name" --config config/cluster.yaml
+
+if [[ -z "$context" ]]; then
+	context="$name-local"
+fi
 
 kubectx "$context=k3d-$name"

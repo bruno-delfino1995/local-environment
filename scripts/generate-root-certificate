@@ -8,7 +8,8 @@ Generates a root certificate to be used within the cluster
 Usage: generate-root-certificate [options]
 
 Options:
-  -h, --help  Show help options.
+  -h, --help          Show help options.
+  -n, --name <VALUE>  Name for organization on the certificate [default: Example].
 EOF
 )"
 
@@ -25,11 +26,13 @@ if [[ -e "$CRT_PATH" && -e "$KEY_PATH" ]]; then
 fi
 
 echo "Creating local root certificate..."
-# NOTE: This certificate is used only for local development, we don't need to
+# NOTE: This certificate is used only for local development, you don't need to
 # worry neither about creating certificate chains with intermediate certicates
 # nor regarding the key length.
+export name
+cat config/certificate.conf.template | envsubst > data/certs/tls.conf
 openssl req -x509 -sha256 -days 3650 -newkey rsa:2048 \
-    -config config/certificate.conf -keyout "$KEY_PATH" \
+    -config data/certs/tls.conf -keyout "$KEY_PATH" \
     -out "$CRT_PATH" &> /dev/null
 
 echo "Certificate successfully generated at: $CRT_PATH"

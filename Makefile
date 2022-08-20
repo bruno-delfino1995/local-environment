@@ -1,11 +1,11 @@
-name = oddin
-context = oddin-local
+name = example
+context = example-local
 
 .PHONY: install
 install:
 	@bash ./scripts/create-cluster -n ${name} -c ${context}
 	@bash ./scripts/generate-root-certificate
-	@bash ./scripts/setup-cluster -d "${name}.localhost" -r "registry.${name}.org" -p false
+	@bash ./scripts/setup-cluster -d "${name}.localhost" -r "registry.${name}.com" -p false
 
 .PHONY: uninstall
 uninstall:

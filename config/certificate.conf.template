@@ -7,10 +7,8 @@ distinguished_name = root_dn
 x509_extensions = extensions
 
 [ root_dn ]
-countryName = BR
-stateOrProvinceName = Sao-Paulo
-0.organizationName = Oddin Org
-commonName = Oddin Local Root CA
+0.organizationName = ${name} Org
+commonName = ${name} Local Root CA
 
 [ extensions ]
 keyUsage = critical,keyCertSign,cRLSign
